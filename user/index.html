@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Интернет-магазин</title>
+  <style>
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px;
+      width: 250px;
+    }
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Каталог товаров</h1>
+  <div id="products" class="card-container"></div>
+
+  <script>
+    fetch('/main')
+      .then(res => res.json())
+      .then(products => {
+        const container = document.getElementById('products');
+        products.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <h3>${product.name}</h3>
+            <p><strong>Цена:</strong> ${product.price} ₽</p>
+            <p>${product.description}</p>
+            <p><strong>Категории:</strong> ${product.categories.join(', ')}</p>
+          `;
+          container.appendChild(card);
+        });
+      });
+  </script>
+</body>
+</html>
