@@ -7,5 +7,5 @@
 # Установка
 
 ```bash
-git clone <ваша-ссылка-на-репозиторий>
-cd FRONT_AND_BACK_3
+git clone 
+cd FRONT_AND_BACK_3 https://github.com/Karp1120/Front_and_Back_3.git
