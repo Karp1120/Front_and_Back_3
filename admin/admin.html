@@ -84,7 +84,49 @@
       <input type="number" placeholder="ID товара" name="id" required>
       <button type="submit">Удалить</button>
     </form>
+
+    <h3>💬 Чат поддержки</h3>
+    <div id="chatBox" style="height: 200px; border: 1px solid #ccc; border-radius: 6px; padding: 8px; overflow-y: auto; background-color: #f5f5f5; font-size: 14px; margin-bottom: 10px;"></div>
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <input type="text" id="chatInput" placeholder="Сообщение..." style="flex: 1; padding: 6px 10px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc;">
+      <button onclick="sendMessage()" style="padding: 6px 14px; font-size: 14px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Отпр.</button>
+    </div>
   </div>
+
+  <script>
+    const ROLE = "Админ";
+    const ws = new WebSocket('ws://localhost:4000');
+    const chatBox = document.getElementById('chatBox');
+    const input = document.getElementById('chatInput');
+
+    function appendMessage(text) {
+      const bubble = document.createElement('div');
+      const isMine = text.startsWith(ROLE + ":");
+      bubble.textContent = text;
+      bubble.style.margin = '4px 0';
+      bubble.style.padding = '6px 10px';
+      bubble.style.borderRadius = '10px';
+      bubble.style.maxWidth = '70%';
+      bubble.style.wordBreak = 'break-word';
+      bubble.style.backgroundColor = isMine ? '#cce5ff' : '#e8e8e8';
+      bubble.style.alignSelf = isMine ? 'flex-end' : 'flex-start';
+      chatBox.appendChild(bubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    ws.onmessage = (event) => {
+      appendMessage(event.data);
+    };
+
+    function sendMessage() {
+      const msg = input.value.trim();
+      if (!msg) return;
+      const fullMsg = `${ROLE}: ${msg}`;
+      ws.send(fullMsg);
+      appendMessage(fullMsg);
+      input.value = '';
+    }
+  </script>
 
   <script>
     const API_URL = 'http://localhost:3000/products';
