@@ -17,27 +17,67 @@
     }
   </style>
 </head>
+<hr>
+<h2>Чат с поддержкой</h2>
+<div id="chat" style="height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;"></div>
+<input type="text" id="chatInput" placeholder="Введите сообщение..." style="width: 80%;">
+<button onclick="sendMessage()">Отправить</button>
+
+<script>
+  const chatBox = document.getElementById('chat');
+  const input = document.getElementById('chatInput');
+
+  const ws = new WebSocket('ws://localhost:4000');
+
+  ws.onmessage = (event) => {
+    const p = document.createElement('p');
+    p.textContent = event.data;
+    chatBox.appendChild(p);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  };
+
+  function sendMessage() {
+    if (input.value.trim()) {
+      ws.send("Пользователь: " + input.value);
+      input.value = '';
+    }
+  }
+</script>
+
 <body>
   <h1>Каталог товаров</h1>
   <div id="products" class="card-container"></div>
 
   <script>
-    fetch('/main')
-      .then(res => res.json())
-      .then(products => {
-        const container = document.getElementById('products');
-        products.forEach(product => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <h3>${product.name}</h3>
-            <p><strong>Цена:</strong> ${product.price} ₽</p>
-            <p>${product.description}</p>
-            <p><strong>Категории:</strong> ${product.categories.join(', ')}</p>
-          `;
-          container.appendChild(card);
-        });
-      });
+    fetch('/graphql', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    query: `
+      {
+        productsShort {
+          name
+          price
+        }
+      }
+    `
+  })
+})
+.then(res => res.json())
+.then(result => {
+  const products = result.data.productsShort;
+  const container = document.getElementById('products');
+  products.forEach(product => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${product.name}</h3>
+      <p><strong>Цена:</strong> ${product.price} ₽</p>
+    `;
+    container.appendChild(card);
+  });
+});
+
   </script>
 </body>
 </html>
